@@ -2,6 +2,7 @@
 #include <iostream>
 #include <queue>
 #include <stack>
+#include <list>
 #include <vector>
 #include <cmath>
 #include <string>
@@ -16,7 +17,7 @@ bool** allocateMaze(int height, int width)
 
     for( int i = 0; i <= height - 1; i++)
         for(int j = 0; j <= width-1; j++)
-      // ??    temp[i][j]= 0;
+           temp[i][j]= 0;
 
     return temp;
 
@@ -27,7 +28,7 @@ bool** allocateEmptyMatrix(int height, int width)
 {
 	bool** temp;
     temp = new bool*[height];
-    for(int i = 0; i < m; i++)
+    for(int i = 0; i < height; i++)
         temp[i] = new bool[width];
 
     for( int i = 0; i <= height - 1; i++)
@@ -48,6 +49,7 @@ typedef struct Node
 	int g, h2, f2, f4;
 	float h1, f1, f3;
 } *NodeS;
+
 
 
 class mycomparison
@@ -82,9 +84,14 @@ public:
 				return agr1->f4 > agr2-> f4;
 				break;
 			}
+			
+			default: {
+				cout << "invalid modaparam";
+				return false;
+			}
 		}
 	}
-}
+};
 
 typedef priority_queue <NodeS, vector<NodeS>, mycomparison> mypq_type;
 
@@ -92,7 +99,10 @@ typedef priority_queue <NodeS, vector<NodeS>, mycomparison> mypq_type;
 int gx(NodeS p)
 {
 	if(p == NULL)
+	{
+		cout << "can't caculate gx because NodeS p == null";
 		return 0;
+	}
 	else
 	{
 		NodeS parent = p->parent;
@@ -134,6 +144,7 @@ NodeS makeNode(int x, int y)
 	temp->y = y;
 	temp->parent = NULL;
 	temp->msg = "";
+	
 	temp->g = 0;
 	temp->h1 = 0.0;
 	temp->h2 = 0;
@@ -177,14 +188,14 @@ void expandNodeU(NodeS p, bool** maze, bool** close, int height, int width, Node
 	caculateCost(newNode, goal);
 
 	pq.push(newNode);
-	L.push(newNode);
+	L.push_back(newNode);
 
 }
 
 
 void expandNodeD(NodeS p, bool** maze, bool** close, int height, int width, NodeS goal, mypq_type& pq, list<NodeS>& L)
 {
-	if( p->x == height - 1 || a[p->x + 1][p->y] == 1 || close[p->x + 1][p->y] == true )
+	if( p->x == height - 1 || maze[p->x + 1][p->y] == 1 || close[p->x + 1][p->y] == true )
 		return;
 
 	NodeS newNode = makeNode(p->x + 1, p->y);
@@ -194,7 +205,7 @@ void expandNodeD(NodeS p, bool** maze, bool** close, int height, int width, Node
 	caculateCost(newNode, goal);
 
 	pq.push(newNode);
-	L.push(newNode);
+	L.push_back(newNode);
 
 }
 
@@ -211,7 +222,7 @@ void expandNodeL(NodeS p, bool** maze, bool** close, int height, int width, Node
 	caculateCost(newNode, goal);
 
 	pq.push(newNode);
-	L.push(newNode);
+	L.push_back(newNode);
 
 }
 
@@ -228,7 +239,7 @@ void expandNodeR(NodeS p, bool** maze, bool** close, int height, int width, Node
 	caculateCost(newNode, goal);
 
 	pq.push(newNode);
-	L.push(newNode);
+	L.push_back(newNode);
 
 }
 
@@ -299,23 +310,40 @@ void trace(NodeS reachFlag)
 	}
 }
 
-void AStart (bool** maze, int height, int width, int x1, int y1, int x2, int y2, int mode=0)
+void freeMemory(list<NodeS>& L)
 {
+	list<NodeS>::iterator it;
+	for(it = L.begin(); it != L.end(); it++)
+	{
+		delete *it;
+	}
+}
+
+void AStart (bool** maze, int height, int width, int x1, int y1, int x2, int y2, int modeparam=0)
+{
+
 	NodeS goal = makeGoalNode(x2, y2);
 	NodeS start = makeStartNode(x1, y1, goal);
 	NodeS reachFlag = NULL;
 
-	mypq_type pq(mycomparison(mode));
+	mypq_type pq(modeparam);
 	list<NodeS> L;
 
 	bool** close = allocateEmptyMatrix(height, width);
 
-	reach = solution(start, goal, reachFlag, maze, close, height, width, pq, L);
-	trace(reach);
+	reachFlag = solution(start, goal, reachFlag, maze, close, height, width, pq, L);
+	trace(reachFlag);
+	freeMemory(L);
 }
 
 int main()
 {
+	int height = 10, width = 10;
+	int x1 = 0, y1 = 0, x2 = 3, y2 = 3;
+	int modeparam = 0;
+	bool** maze = allocateMaze(height, width);
+	
+	AStart(maze, height, width, x1, y1, x2, y2, modeparam);
 	cout << "hello world!";
 	return 0;
 }
