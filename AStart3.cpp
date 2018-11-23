@@ -317,6 +317,9 @@ void trace(NodeS reachFlag, stack<NodeS>& S)
 
 void printPath(stack<NodeS> S)
 {
+	if (S.empty()) 
+	return;
+	
 	cout << "\n\n\n*********************Solution:********************* \n";
 		cout << "Start:";
 		while ( !S.empty() )
@@ -348,6 +351,8 @@ void printAction(stack<NodeS> S)
 
 void printCost(stack<NodeS> S, int modeparam)
 {
+	if (S.empty()) 
+	return;
 
 	cout << "Cost: ";
 	if(modeparam == 0)
@@ -441,12 +446,12 @@ int main()
 	
 	int height = 10, width = 10;
 	int x1 = 0, y1 = 0, x2 = 2, y2 = 2;
-	int modeparam = 3;
+	int modeparam = 2;
 	bool** maze = allocateMaze(height, width);
-	bool** mazeempty= allocateEmptyMatrix(height, width);
-//	printMatrix(maze, height, width);
+//	bool** mazeempty= allocateEmptyMatrix(height, width);
+	printMatrix(maze, height, width);
 	
-	AStart(mazeempty, height, width, x1, y1, x2, y2, modeparam);
+	AStart(maze, height, width, x1, y1, x2, y2, modeparam);
 	cout << "\nhello world!";
 	return 0;
 }
