@@ -423,19 +423,19 @@ void AStart (bool** maze, int height, int width, int x1, int y1, int x2, int y2,
     freeMemory(L);
 }
 
-int main()
-{
-
-    int height = 10, width = 10;
-    int x1 = 0, y1 = 0, x2 = 2, y2 = 2;
-    int mode = 2;
-    bool** maze = allocateMaze(height, width);
-    bool** mazeempty= allocateEmptyMatrix(height, width);
-    printMatrix(maze, height, width);
-    
-    AStart(mazeempty, height, width, x1, y1, x2, y2, 1, 5, 1);
-    cout << "\nhello world!";
-    return 0;
-}
+//int main()
+//{
+//
+//    int height = 10, width = 10;
+//    int x1 = 0, y1 = 0, x2 = 2, y2 = 2;
+//    int mode = 2;
+//    bool** maze = allocateMaze(height, width);
+//    bool** mazeempty= allocateEmptyMatrix(height, width);
+//    printMatrix(maze, height, width);
+//    
+//    AStart(mazeempty, height, width, x1, y1, x2, y2, 1, 5, 1);
+//    cout << "\nhello world!";
+//    return 0;
+//}
 
 
