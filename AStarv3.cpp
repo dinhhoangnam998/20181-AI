@@ -1,3 +1,28 @@
+/*
+author: dinh hoang nam
+date: 23/11/2018
+purpose: AStar function
+
+idea: ....... ( i'll update later)
+
+to use this AStar function:
+- include: "AStarv3.h"
+- call: void AStart (bool** maze, int height, int width, int x1, int y1, int x2, int y2, int alpha = 1, int beta = 2, int mode = 1 )
+
+ + maze: matrix of maze
+ + height: number of rows
+ + width: number of columns
+ + x1, y1: coordinates of start 
+ + x2, y2: corrdinates of target
+ + f = alpha*g + beta*h1 (if mode = 1)
+ + f = alpha*g + beta*h2 (if mode = 2)
+
+
+
+
+*/
+
+
 #include <stdio.h>
 #include <iostream>
 #include <iomanip>
@@ -12,10 +37,12 @@
 #include "data_type.h"
 using namespace std;
 
-
+// 
 extern vector <coordinate> path;   
 extern vector <coordinate> visitHistory; 
 
+
+// allocate Maze for unit test
 bool** allocateMaze(int height, int width)
 {
     srand(time(NULL));
@@ -32,7 +59,7 @@ bool** allocateMaze(int height, int width)
 
 }
 
-
+// allocate empty matrix for close[][]
 bool** allocateEmptyMatrix(int height, int width)
 {
     bool** temp;
@@ -48,6 +75,8 @@ bool** allocateEmptyMatrix(int height, int width)
 
 }
 
+
+// print matrix 
 void printMatrix(bool** matrix, int height, int width)
 {
     for( int i = 0; i < height; i++)
@@ -61,7 +90,7 @@ void printMatrix(bool** matrix, int height, int width)
     }
 }
 
-
+// struct of a Node (a state)
 typedef struct Node
 {
     int x, y;
@@ -74,14 +103,18 @@ typedef struct Node
     float f;
 } *NodeS;
 
+// for ordering of priory_queue
 struct myComparator {
     bool operator() (NodeS arg1, NodeS arg2) {
         return arg1->f > arg2->f;
     }
 };
 
+//short name
 typedef priority_queue<NodeS, vector<NodeS>, myComparator> mypq_type;
 
+
+// g(x)
 int gx(NodeS p)
 {
     if(p == NULL)
@@ -99,17 +132,21 @@ int gx(NodeS p)
     }
 }
 
+// h1(x)
 float h1x(NodeS p, NodeS goal)
 {
     return sqrt( (p->x - goal->x)*(p->x - goal->x) + (p->y - goal->y)*(p->y - goal->y) );
 }
 
 
+// h2(x)
 int h2x(NodeS p, NodeS goal)
 {
     return ( abs(p->x - goal->x) + abs(p->y - goal->y) );
 }
 
+
+// f(x) = alpha * g + beta* h1 (mode = 1) || f(x) = alpha* g + beta* h2 (mode = 2)
 void caculateCost(NodeS p, NodeS goal, int alpha = 1, int beta = 2, int mode = 1 )
 {
     p->g = gx(p);
@@ -126,6 +163,8 @@ void caculateCost(NodeS p, NodeS goal, int alpha = 1, int beta = 2, int mode = 1
     }
 }
 
+
+// make a empty Node
 NodeS makeNode(int x, int y)
 {
     NodeS temp = new Node;
@@ -142,6 +181,8 @@ NodeS makeNode(int x, int y)
     return temp;
 }
 
+
+// make target node
 NodeS makeGoalNode(int x, int y)
 {
     NodeS goal = makeNode(x, y);
@@ -150,6 +191,8 @@ NodeS makeGoalNode(int x, int y)
 
 }
 
+
+// make inital node
 NodeS makeStartNode(int x, int y, NodeS goal, int alpha = 1, int beta = 2, int mode = 1 )
 {
     NodeS start = makeNode(x, y);
@@ -161,7 +204,7 @@ NodeS makeStartNode(int x, int y, NodeS goal, int alpha = 1, int beta = 2, int m
     return start;
 }
 
-
+// expand up
 void expandNodeU(NodeS p, bool** maze, bool** close, int height, int width, NodeS goal, mypq_type& pq, list<NodeS>& L, int alpha = 1, int beta = 2, int mode = 1 )
 {
     if( p->x == 0 || maze[p->x - 1][p->y] == 1 || close[p->x -1][p->y] == true )
@@ -178,7 +221,7 @@ void expandNodeU(NodeS p, bool** maze, bool** close, int height, int width, Node
 
 }
 
-
+// expand down
 void expandNodeD(NodeS p, bool** maze, bool** close, int height, int width, NodeS goal, mypq_type& pq, list<NodeS>& L, int alpha = 1, int beta = 2, int mode = 1 )
 {
     if( p->x == height - 1 || maze[p->x + 1][p->y] == 1 || close[p->x + 1][p->y] == true )
@@ -195,7 +238,7 @@ void expandNodeD(NodeS p, bool** maze, bool** close, int height, int width, Node
 
 }
 
-
+//
 void expandNodeL(NodeS p, bool** maze, bool** close, int height, int width, NodeS goal, mypq_type& pq, list<NodeS>& L, int alpha = 1, int beta = 2, int mode = 1 )
 {
     if( p->y == 0 || maze[p->x][p->y - 1] == 1 || close[p->x][p-> y - 1] == true )
@@ -212,7 +255,7 @@ void expandNodeL(NodeS p, bool** maze, bool** close, int height, int width, Node
 
 }
 
-
+//
 void expandNodeR(NodeS p, bool** maze, bool** close, int height, int width, NodeS goal, mypq_type& pq, list<NodeS>& L, int alpha = 1, int beta = 2, int mode = 1 )
 {
     if( p->y == width - 1 || maze[p->x][p->y + 1] == 1 || close[p->x][p->y + 1] == true )
@@ -229,7 +272,7 @@ void expandNodeR(NodeS p, bool** maze, bool** close, int height, int width, Node
 
 }
 
-
+//for short calling
 void expandNode(NodeS p, bool** maze, bool** close, int height, int width, NodeS goal, mypq_type& pq, list<NodeS>& L, int alpha = 1, int beta = 2, int mode = 1 )
 {
     expandNodeU(p, maze, close, height, width, goal, pq, L, alpha, beta, mode);
@@ -238,11 +281,15 @@ void expandNode(NodeS p, bool** maze, bool** close, int height, int width, NodeS
     expandNodeL(p, maze, close, height, width, goal, pq, L, alpha, beta, mode);
 }
 
+
+// check if reach target
 bool checkGoal(NodeS p, NodeS goal)
 {
     return ( p->x == goal->x && p->y == goal->y );
 }
 
+
+// call all of the functions above
 NodeS solution(NodeS start, NodeS goal, NodeS reachFlag, bool** maze, bool** close, int height, int width, mypq_type& pq, list<NodeS>& L, int alpha = 1, int beta = 2, int mode = 1 )
 {
     pq.push(start);
@@ -269,7 +316,7 @@ NodeS solution(NodeS start, NodeS goal, NodeS reachFlag, bool** maze, bool** clo
     return NULL;
 }
 
-
+// trace the path
 void trace(NodeS reachFlag, stack<NodeS>& S)
 {
     if( reachFlag == NULL)
@@ -285,6 +332,7 @@ void trace(NodeS reachFlag, stack<NodeS>& S)
     }
 }
 
+// print path
 void printPath(stack<NodeS> S)
 {
     if (S.empty()) 
@@ -300,7 +348,7 @@ void printPath(stack<NodeS> S)
         cout << "\b\b\b\b\b:Goal!\n";
 
 }
-
+//
 void printAction(stack<NodeS> S)
 {
     if (S.empty()) 
@@ -318,7 +366,7 @@ void printAction(stack<NodeS> S)
     }
     cout << endl;
 }
-
+//
 void printCost(stack<NodeS> S)
 {
     if(S.empty())
@@ -334,7 +382,7 @@ void printCost(stack<NodeS> S)
         }
     }
 }
-
+//
 void printResult(stack<NodeS> S)
 {
     if( S.empty() )
@@ -351,7 +399,7 @@ void printResult(stack<NodeS> S)
     }
 }
 
-
+// put path to "vector <coordinate> path"
 void translate4Path(stack<NodeS> S)
 {
 	if( S.empty() )
@@ -373,6 +421,7 @@ void translate4Path(stack<NodeS> S)
 
 }
 
+// put visit history to "vector <coordinate> visitHistory"
 void translate4visitHistory(list<NodeS>& L)
 {
 	visitHistory.clear();
@@ -390,7 +439,7 @@ void translate4visitHistory(list<NodeS>& L)
 	}
 }
 
-
+// free memory
 void freeMemory(list<NodeS>& L)
 {
     list<NodeS>::iterator it;
@@ -402,6 +451,7 @@ void freeMemory(list<NodeS>& L)
     //free array and matrix///
 }
 
+// oke, call this funtion from main();
 void AStart (bool** maze, int height, int width, int x1, int y1, int x2, int y2, int alpha = 1, int beta = 2, int mode = 1 )
 {
 
@@ -422,6 +472,9 @@ void AStart (bool** maze, int height, int width, int x1, int y1, int x2, int y2,
     translate4visitHistory(L);
     freeMemory(L);
 }
+
+
+// just copy this main() if you want quick test
 
 //int main()
 //{
