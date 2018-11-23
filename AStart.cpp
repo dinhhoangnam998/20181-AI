@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <iostream>
+#include <iomanip>
+#include <stdlib.h>
+#include <time.h>
 #include <queue>
 #include <stack>
 #include <list>
@@ -10,6 +13,7 @@ using namespace std;
 
 bool** allocateMaze(int height, int width)
 {
+	srand(time(NULL));
 	bool** temp;
     temp = new bool*[height];
     for(int i = 0; i < height; i++)
@@ -17,7 +21,7 @@ bool** allocateMaze(int height, int width)
 
     for( int i = 0; i <= height - 1; i++)
         for(int j = 0; j <= width-1; j++)
-           temp[i][j]= 0;
+           temp[i][j]= rand()%2;
 
     return temp;
 
@@ -37,6 +41,20 @@ bool** allocateEmptyMatrix(int height, int width)
 
     return temp;
 
+}
+
+void printMatrix(bool** matrix, int height, int width, string matrixName="noName")
+{
+	cout << "\n" << matrixName << ":\n";
+	for( int i = 0; i < height; i++)
+	{
+		for( int j = 0; j < width; j++)
+		{
+			printf("%5d",matrix[i][j]);
+		}
+		
+		cout << endl;
+	}
 }
 
 
@@ -168,7 +186,7 @@ NodeS makeStartNode(int x, int y, NodeS goal)
 {
 	NodeS start = makeNode(x, y);
 	start->parent = NULL;
-	start->msg = "Start:";
+	start->msg = "Start";
 	
 	caculateCost(start, goal);
 
@@ -283,7 +301,51 @@ NodeS solution(NodeS start, NodeS goal, NodeS reachFlag, bool** maze, bool** clo
 	return NULL;
 }
 
-void trace(NodeS reachFlag)
+void printCost(stack<NodeS> S3, int modeparam)
+{
+
+	cout << "Cost: ";
+	if(modeparam == 0)
+	{
+		while (!S3.empty())
+		{
+			NodeS it = S3.top(); S3.pop();
+			printf(" %3.2f     ", it->f1);
+		}	
+	}
+	
+	if(modeparam == 1)
+	{
+		while (!S3.empty())
+		{
+			NodeS it = S3.top(); S3.pop();
+			printf(" %3d      ", it->f2);
+		}	
+	}
+	
+	if(modeparam == 2)
+	{
+		while (!S3.empty())
+		{
+			NodeS it = S3.top(); S3.pop();
+			printf(" %3.2f     ", it->f3);
+		}	
+	}
+	
+	if(modeparam == 3)
+	{
+		while (!S3.empty())
+		{
+			NodeS it = S3.top(); S3.pop();
+			printf(" %3d      ", it->f4);
+		}	
+	}
+	
+	cout << endl;
+	
+}
+
+void trace(NodeS reachFlag, int modeparam)
 {
 	if( reachFlag == NULL )
 	{
@@ -292,7 +354,7 @@ void trace(NodeS reachFlag)
 
 	else
 	{
-		stack<NodeS> S;
+		stack<NodeS> S,S1,S3;
 		NodeS it = reachFlag;
 
 		while( it != NULL )
@@ -300,13 +362,37 @@ void trace(NodeS reachFlag)
 			S.push(it);
 			it = it->parent;
 		}
-
+		
+		S1 = S;
+		S3 = S;
+		
+		//print path
+		cout << "\n\n\n*********************Solution:********************* \n";
+		cout << "Start:";
 		while ( !S.empty() )
 		{
 			NodeS it = S.top(); S.pop();
 			cout << "<" << it->x << "," << it->y << "> --> ";
 		}
-		cout << "(y)!";
+		cout << "\b\b\b\b\b:Goal!\n";
+
+		
+		// print cost
+		printCost(S3, modeparam);
+
+	
+		// print action
+		cout << "Start:";
+		S1.pop();
+		while( !S1.empty() )
+		{
+			NodeS it = S1.top(); S1.pop();
+			
+			cout << "       " << it->msg << "  ";
+		}
+		cout << endl;
+	
+
 	}
 }
 
@@ -332,18 +418,22 @@ void AStart (bool** maze, int height, int width, int x1, int y1, int x2, int y2,
 	bool** close = allocateEmptyMatrix(height, width);
 
 	reachFlag = solution(start, goal, reachFlag, maze, close, height, width, pq, L);
-	trace(reachFlag);
+	trace(reachFlag, modeparam);
 	freeMemory(L);
 }
 
 int main()
 {
-	int height = 10, width = 10;
-	int x1 = 0, y1 = 0, x2 = 3, y2 = 3;
-	int modeparam = 0;
-	bool** maze = allocateMaze(height, width);
+
 	
-	AStart(maze, height, width, x1, y1, x2, y2, modeparam);
-	cout << "hello world!";
+	int height = 10, width = 10;
+	int x1 = 0, y1 = 0, x2 = 2, y2 = 2;
+	int modeparam = 3;
+	bool** maze = allocateMaze(height, width);
+	bool** mazeempty= allocateEmptyMatrix(height, width);
+	printMatrix(maze, height, width);
+	
+	AStart(mazeempty, height, width, x1, y1, x2, y2, modeparam);
+	cout << "\nhello world!";
 	return 0;
 }
