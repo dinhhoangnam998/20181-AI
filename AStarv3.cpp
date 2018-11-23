@@ -12,7 +12,7 @@
 #include "data_type.h"
 using namespace std;
 
-// #include data_type;
+
 extern vector <coordinate> path;   
 extern vector <coordinate> visitHistory; 
 
