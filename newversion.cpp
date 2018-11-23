@@ -9,7 +9,7 @@
 #include <vector>
 #include <cmath>
 #include <string>
-
+#include "data_type.h"
 using namespace std;
 
 // #include data_type;
@@ -373,7 +373,7 @@ void translate4Path(stack<NodeS> S)
 
 }
 
-void translate4visitHistory(list<NodeS> L)
+void translate4visitHistory(list<NodeS>& L)
 {
 	visitHistory.clear();
 	
@@ -418,6 +418,8 @@ void AStart (bool** maze, int height, int width, int x1, int y1, int x2, int y2,
     reachFlag = solution(start, goal, reachFlag, maze, close, height, width, pq, L, alpha, beta, mode);
     trace(reachFlag, S);
     printResult(S);
+    translate4Path(S);
+    translate4visitHistory(L);
     freeMemory(L);
 }
 
