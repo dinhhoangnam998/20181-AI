@@ -142,7 +142,7 @@ int h2x(NodeS p, NodeS goal)
 	return ( abs(p->x - goal->x) + abs(p->y - goal->y) );
 }
 
-void caculateCost(NodeS p, NodeS goal)
+void caculateCost(NodeS p, NodeS goal, float alpha)
 {
 	p->g = gx(p);
 	p->h1 = h1x(p, goal);
@@ -150,8 +150,8 @@ void caculateCost(NodeS p, NodeS goal)
 
 	p->f1 = p->h1;
 	p->f2 = p->h2;
-	p->f3 = p->g + p->h1;
-	p->f4 = p->g + p->h2;
+	p->f3 = p->g + alpha*(p->h1);
+	p->f4 = p->g + alpha*(p->h2);
 }
 
 
@@ -300,6 +300,7 @@ NodeS solution(NodeS start, NodeS goal, NodeS reachFlag, bool** maze, bool** clo
 
 	return NULL;
 }
+
 void trace(NodeS reachFlag, stack<NodeS>& S)
 {
 	if( reachFlag == NULL)
